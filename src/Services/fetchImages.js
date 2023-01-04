@@ -11,3 +11,9 @@ export const fetchImages = async (name, imgPerPage, numberPage) => {
   }
   return await response.json();
 };
+
+//  const res = useCallback(async () => {
+//       const data = await fetchImages(search, imgPerPage, numberPage);
+
+//       // setData(data);
+//     }, []);

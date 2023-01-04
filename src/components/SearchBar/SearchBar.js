@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Formik, ErrorMessage } from 'formik';
 import { IconContext } from 'react-icons';
 import { GiArchiveResearch } from 'react-icons/gi';
@@ -20,45 +20,47 @@ const SearchSchema = Yup.object().shape({
     .max(10, 'Less than 10 characters required!'),
 });
 
-export class SearchBar extends Component {
-  searchQuery = (values, { resetForm }) => {
-    this.props.handleSubmit(values);
+export const SearchBar = ({ handleSubmit }) => {
+  const searchQuery = (values, { resetForm }) => {
+    handleSubmit(values);
     resetForm({ values: '' });
   };
 
-  render() {
-    return (
-      <Header>
-        <Container>
-          <Formik
-            initialValues={{ search: '' }}
-            onSubmit={this.searchQuery}
-            validationSchema={SearchSchema}
-          >
-            {({ dirty, isValid }) => (
-              <FormWrp>
-                <InputWrp
-                  name="search"
-                  type="text"
-                  autoComplete="off"
-                  autoFocus
-                  placeholder="Search images and photos"
-                />
-                <ErrorMessage name="search" component={ErrorMsg} />
-                <ButtonSearch type="submit" disabled={!(isValid && dirty)}>
-                  <IconContext.Provider
-                    value={{
-                      size: '30px',
-                    }}
-                  >
-                    <GiArchiveResearch />
-                  </IconContext.Provider>
-                </ButtonSearch>
-              </FormWrp>
-            )}
-          </Formik>
-        </Container>
-      </Header>
-    );
-  }
-}
+  return (
+    <Header>
+      <Container>
+        <Formik
+          initialValues={{ search: '' }}
+          onSubmit={searchQuery}
+          validationSchema={SearchSchema}
+        >
+          {({ dirty, isValid }) => (
+            <FormWrp>
+              <InputWrp
+                name="search"
+                type="text"
+                autoComplete="off"
+                autoFocus
+                placeholder="Search images and photos"
+              />
+              <ErrorMessage name="search" component={ErrorMsg} />
+              <ButtonSearch type="submit" disabled={!(isValid && dirty)}>
+                <IconContext.Provider
+                  value={{
+                    size: '30px',
+                  }}
+                >
+                  <GiArchiveResearch />
+                </IconContext.Provider>
+              </ButtonSearch>
+            </FormWrp>
+          )}
+        </Formik>
+      </Container>
+    </Header>
+  );
+};
+
+SearchBar.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+};
