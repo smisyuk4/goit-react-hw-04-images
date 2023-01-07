@@ -35,7 +35,6 @@ export const ImageGallery = ({
 
     setStatusLoading(true);
 
-    fetchImages();
     async function fetchImages() {
       try {
         const { totalHits, hits } = await fetchApi(search, numberPage);
@@ -57,7 +56,7 @@ export const ImageGallery = ({
           setTotalHits(null);
           setNumbePage(1);
 
-          // showError(true);
+          showError(true);
           return;
         }
       } catch (error) {
@@ -66,7 +65,9 @@ export const ImageGallery = ({
         setStatusLoading(false);
       }
     }
-  }, [search, numberPage]);
+
+    fetchImages();
+  }, [search, numberPage, showError]);
 
   const incrementPage = () => {
     // this.setState(prevState => {
