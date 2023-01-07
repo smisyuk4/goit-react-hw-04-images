@@ -1,117 +1,72 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Scroll from 'react-scroll';
-import { fetchImages } from 'Services/fetchImages';
+import { fetchApi } from 'Services/fetchApi';
 import { ImageGalleryItem } from 'components/ImageGalleryItem';
 import { ButtonLoadMore } from 'components/ButtonLoadMore';
 import { Blocks } from 'react-loader-spinner';
 import { imgTemplate } from './ImageTemplate';
 import { Container, ImageList } from './ImageGallery.styled';
 
-// const INITIAL_VALUE = {
-//   images: [],
-//   loading: false,
-//   totalHits: null,
-//   numberPage: 1,
-//   imgPerPage: 12,
-// };
 export const ImageGallery = ({
   search,
   showError,
   initialModal,
   showModal,
 }) => {
-  // state = {
-  //   ...INITIAL_VALUE,
-  //   images: [...imgTemplate],
-  // };
-  const [f, setData] = useState([]);
   const [images, setImages] = useState([...imgTemplate]);
   const [loading, setStatusLoading] = useState(false);
   const [totalHits, setTotalHits] = useState(null);
   const [numberPage, setNumbePage] = useState(1);
-  const [imgPerPage, setImgPerGage] = useState(12);
 
-  const fetchData = useCallback(async () => {
-    const data = await fetchImages(search, imgPerPage, numberPage);
+  useEffect(() => {
+    if (search === '') {
+      return;
+    }
+    setImages([]);
+    setTotalHits(null);
+    setNumbePage(1);
+  }, [search]);
 
-    setData(data);
-    // return data;
-  }, []);
+  useEffect(() => {
+    if (search === '') {
+      return;
+    }
 
-  // useEffect(() => {
-  //   setStatusLoading(true);
+    setStatusLoading(true);
 
-  //   try {
-  //     // const res = fetchImages(search, imgPerPage, numberPage);
-  //     fetchData();
-  //     console.log(f);
-  // const { totalHits, hits } = res;
+    fetchImages();
+    async function fetchImages() {
+      try {
+        const { totalHits, hits } = await fetchApi(search, numberPage);
 
-  // if (hits.length === 0) {
-  //   setImages([...imgTemplate]);
-  //   setStatusLoading(false);
-  //   setTotalHits(null);
-  //   setNumbePage(1);
-  //   setImgPerGage(12);
+        if (numberPage === 1) {
+          setImages([...hits]);
+          setTotalHits(totalHits);
+          return;
+        }
 
-  //   showError(true);
-  //   return;
-  // }
+        if (numberPage > 1) {
+          setImages(prevState => [...prevState, ...hits]);
+          return;
+        }
 
-  // if (numberPage === 1) {
-  //   setImages([...hits]);
-  //   setTotalHits(totalHits);
-  //   return;
-  // }
+        if (hits.length === 0) {
+          setImages([...imgTemplate]);
+          setStatusLoading(false);
+          setTotalHits(null);
+          setNumbePage(1);
 
-  // setImages([...images, ...hits]);
-
-  // this.setState(prevState => {
-  //   if (prevProps.search !== search) {
-  //     return { images: [...hits], totalHits };
-  //   }
-  //   return { images: [...prevState.images, ...hits] };
-  // });
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setStatusLoading(false);
-  //   }
-  // }, [fetchData, images, numberPage, imgPerPage, search, showError]);
-
-  // async componentDidUpdate(prevProps, prevState) {
-  //   const { search, showError } = this.props;
-  //   const { imgPerPage, numberPage } = this.state;
-
-  //   if (prevProps.search !== search || prevState.numberPage !== numberPage) {
-  //     this.setState({ loading: true });
-
-  //     try {
-
-  //       const res = await fetchImages(search, imgPerPage, numberPage);
-  //       const { totalHits, hits } = res;
-
-  //       if (hits.length === 0) {
-  //         this.setState({ ...INITIAL_VALUE });
-  //         showError(true);
-  //         return;
-  //       }
-
-  //       this.setState(prevState => {
-  //         if (prevProps.search !== search) {
-  //           return { images: [...hits], totalHits };
-  //         }
-  //         return { images: [...prevState.images, ...hits] };
-  //       });
-
-  // } catch (error) {
-  //   console.log(error);
-  // } finally {
-  //   this.setState({ loading: false });
-  // }
-  //   }
-  // }
+          // showError(true);
+          return;
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setStatusLoading(false);
+      }
+    }
+  }, [search, numberPage]);
 
   const incrementPage = () => {
     // this.setState(prevState => {
@@ -139,8 +94,6 @@ export const ImageGallery = ({
     initialModal({ link, alt });
     showModal();
   };
-
-  // const { loading, images, totalHits } = this.state;
 
   return (
     <Container>

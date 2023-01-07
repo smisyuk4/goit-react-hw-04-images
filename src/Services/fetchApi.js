@@ -1,8 +1,8 @@
-export const fetchImages = async (name, imgPerPage, numberPage) => {
+export const fetchApi = async (name, numberPage) => {
   const BASE_URL = 'https://pixabay.com/api/';
   const API_KEY = '31327013-dff4de219bc981e4672d8ee09';
   const FILTERS = '&image_type=photo&orientation=horizontal&safesearch=true';
-  const PAGINATION = `&per_page=${imgPerPage}&page=${numberPage}`;
+  const PAGINATION = `&per_page=${12}&page=${numberPage}`;
   const url = `${BASE_URL}?key=${API_KEY}&q=${name}${FILTERS}${PAGINATION}`;
 
   const response = await fetch(url);
@@ -11,9 +11,3 @@ export const fetchImages = async (name, imgPerPage, numberPage) => {
   }
   return await response.json();
 };
-
-//  const res = useCallback(async () => {
-//       const data = await fetchImages(search, imgPerPage, numberPage);
-
-//       // setData(data);
-//     }, []);
