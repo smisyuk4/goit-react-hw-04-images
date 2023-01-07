@@ -7,14 +7,11 @@ import { ButtonLoadMore } from 'components/ButtonLoadMore';
 import { Blocks } from 'react-loader-spinner';
 import { imgTemplate } from './ImageTemplate';
 import { Container, ImageList } from './ImageGallery.styled';
+import { Message } from 'components/Message';
 
-export const ImageGallery = ({
-  search,
-  showError,
-  initialModal,
-  showModal,
-}) => {
+export const ImageGallery = ({ search, initialModal, showModal }) => {
   const [images, setImages] = useState([...imgTemplate]);
+  const [isErrorLoad, setError] = useState(false);
   const [loading, setStatusLoading] = useState(false);
   const [totalHits, setTotalHits] = useState(null);
   const [numberPage, setNumbePage] = useState(1);
@@ -39,6 +36,11 @@ export const ImageGallery = ({
       try {
         const { totalHits, hits } = await fetchApi(search, numberPage);
 
+        if (numberPage === 1 && hits.length === 0) {
+          showError(true);
+          return;
+        }
+
         if (numberPage === 1) {
           setImages([...hits]);
           setTotalHits(totalHits);
@@ -49,16 +51,6 @@ export const ImageGallery = ({
           setImages(prevState => [...prevState, ...hits]);
           return;
         }
-
-        if (hits.length === 0) {
-          setImages([...imgTemplate]);
-          setStatusLoading(false);
-          setTotalHits(null);
-          setNumbePage(1);
-
-          showError(true);
-          return;
-        }
       } catch (error) {
         console.log(error);
       } finally {
@@ -67,7 +59,7 @@ export const ImageGallery = ({
     }
 
     fetchImages();
-  }, [search, numberPage, showError]);
+  }, [numberPage, search]);
 
   const incrementPage = () => {
     // this.setState(prevState => {
@@ -96,8 +88,18 @@ export const ImageGallery = ({
     showModal();
   };
 
+  const showError = status => {
+    setError(status);
+
+    setTimeout(() => {
+      setError(!status);
+    }, 2000);
+  };
+
   return (
     <Container>
+      {isErrorLoad && <Message text="status 200, but not images" />}
+
       {loading && (
         <Blocks
           visible={true}
@@ -125,5 +127,6 @@ export const ImageGallery = ({
 
 ImageGallery.propTypes = {
   search: PropTypes.string.isRequired,
-  showError: PropTypes.func.isRequired,
+  initialModal: PropTypes.func.isRequired,
+  showModal: PropTypes.func.isRequired,
 };
